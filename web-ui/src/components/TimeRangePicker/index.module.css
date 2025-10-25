@@ -1,0 +1,39 @@
+.timeRangePickerContainer {
+  padding: 12px 0;
+}
+
+.presetContainer {
+  padding: 8px;
+}
+
+.absoluteContainer {
+  padding: 8px;
+}
+
+.presetsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.presetButton {
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid #d9d9d9;
+  color: #1890ff;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.presetButton:hover {
+  color: #40a9ff;
+  border-color: #40a9ff;
+  background-color: #f0f5ff;
+}
+
+.presetButton:active {
+  color: #1890ff;
+  background-color: #e6f7ff;
+  border-color: #1890ff;
+}

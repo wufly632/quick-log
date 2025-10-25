@@ -1,0 +1,95 @@
+version: "0.8"
+
+index_id: logs
+
+doc_mapping:
+  field_mappings:
+    - name: timestamp
+      type: datetime
+      input_formats:
+        - rfc3339
+        - unix_timestamp
+      output_format: rfc3339
+      fast: true
+      fast_precision: seconds
+
+    - name: message
+      type: text
+      tokenizer: chinese_compatible
+      record: position
+      stored: true
+
+    - name: level
+      type: text
+      tokenizer: raw
+      fast: true
+      stored: true
+
+    - name: service
+      type: text
+      tokenizer: raw
+      fast: true
+      stored: true
+
+    - name: host
+      type: text
+      tokenizer: raw
+      fast: true
+      stored: true
+
+    - name: env
+      type: text
+      tokenizer: raw
+      fast: true
+      stored: true
+
+    - name: trace_id
+      type: text
+      tokenizer: raw
+      fast: true
+      stored: true
+
+    - name: span_id
+      type: text
+      tokenizer: raw
+      stored: true
+
+    - name: source_file
+      type: text
+      tokenizer: raw
+      stored: true
+
+    - name: line_number
+      type: u64
+      stored: true
+      fast: true
+
+    - name: labels
+      type: json
+      stored: true
+
+    - name: stack_trace
+      type: text
+      tokenizer: chinese_compatible
+      stored: true
+
+  timestamp_field: timestamp
+  mode: dynamic
+
+search_settings:
+  default_search_fields:
+    - message
+    - stack_trace
+    - service
+    - level
+    - trace_id
+    - host
+    - env
+
+indexing_settings:
+  commit_timeout_secs: 3
+  docstore_compression_level: 8
+
+retention:
+  period: 7d
+  schedule: daily
