@@ -2,9 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    build:
-      context: ./query-service
-      dockerfile: Dockerfile
+    image: wufly632/quick-log-backend:latest
     ports:
       - "8080:8080"
     environment:
@@ -16,9 +14,7 @@ services:
       retries: 3
 
   frontend:
-    build:
-      context: ./web-ui
-      dockerfile: Dockerfile
+    image: wufly632/quick-log-frontend:latest
     ports:
       - "3000:80"
     depends_on:
