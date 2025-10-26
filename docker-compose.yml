@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    image: wufly632/quick-log-backend:latest
+    image: xget.wufly.top/cr/dockerhub/wufly632/quick-log-backend:sha-b3d96c7
     ports:
       - "8080:8080"
     environment:
