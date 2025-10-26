@@ -49,6 +49,14 @@ export const getFields = () => {
 }
 
 /**
+ * 获取服务名称列表
+ * @returns {Promise}
+ */
+export const getServices = () => {
+  return apiClient.get('/services')
+}
+
+/**
  * 健康检查
  * @returns {Promise}
  */

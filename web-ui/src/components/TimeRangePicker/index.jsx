@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { DatePicker, Tabs, Button, Space, Row, Col, Divider } from 'antd'
+import { DatePicker, Tabs, Button, Divider } from 'antd'
 import { ClockCircleOutlined, CalendarOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import styles from './index.module.css'
@@ -10,7 +10,7 @@ const { RangePicker } = DatePicker
  * 增强的时间范围选择器，支持相对时间和绝对时间
  * 参考阿里云 SLS 的时间选择交互
  */
-const TimeRangePicker = ({ value, onChange, onOpenChange }) => {
+const TimeRangePicker = ({ value, onChange }) => {
   const [activeTab, setActiveTab] = useState('relative')
   const [customRange, setCustomRange] = useState(value?.dates || [dayjs().subtract(1, 'hour'), dayjs()])
 

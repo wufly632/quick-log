@@ -20,9 +20,9 @@ const SearchPage = () => {
   // 搜索参数状态
   const [searchParams, setSearchParams] = useState({
     query: '*',
-    start_time: null,
-    end_time: null,
     filters: {},
+    time_range_type: 'relative',
+    relative_time_key: '15m',
   })
 
   // 执行搜索

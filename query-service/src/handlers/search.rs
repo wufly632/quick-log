@@ -1,5 +1,5 @@
+use crate::{error::AppError, models::query::SearchRequest, AppState};
 use actix_web::{web, HttpResponse, Result};
-use crate::{AppState, models::query::SearchRequest, error::AppError};
 
 pub async fn search(
     state: web::Data<AppState>,
@@ -9,7 +9,8 @@ pub async fn search(
     req.validate().map_err(AppError::ValidationError)?;
 
     // 计算实际的时间范围（支持相对时间和绝对时间）
-    let (start_time, end_time) = req.compute_time_range()
+    let (start_time, end_time) = req
+        .compute_time_range()
         .map_err(AppError::ValidationError)?;
 
     // 记录日志
@@ -44,4 +45,9 @@ pub async fn get_fields() -> Result<HttpResponse> {
     ];
 
     Ok(HttpResponse::Ok().json(serde_json::json!({ "fields": fields })))
+}
+
+pub async fn list_services(state: web::Data<AppState>) -> Result<HttpResponse, AppError> {
+    let services = state.quickwit.list_services().await?;
+    Ok(HttpResponse::Ok().json(serde_json::json!({ "services": services })))
 }

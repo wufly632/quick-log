@@ -1,11 +1,11 @@
-use actix_web::{web, App, HttpServer, middleware};
+use actix_web::{middleware, web, App, HttpServer};
 use log::info;
 
 mod config;
-mod handlers;
-mod services;
-mod models;
 mod error;
+mod handlers;
+mod models;
+mod services;
 
 use config::Config;
 use services::quickwit::QuickwitClient;
@@ -45,7 +45,14 @@ async fn main() -> std::io::Result<()> {
             // 路由
             .route("/health", web::get().to(handlers::health::health_check))
             .route("/api/v1/search", web::post().to(handlers::search::search))
-            .route("/api/v1/fields", web::get().to(handlers::search::get_fields))
+            .route(
+                "/api/v1/fields",
+                web::get().to(handlers::search::get_fields),
+            )
+            .route(
+                "/api/v1/services",
+                web::get().to(handlers::search::list_services),
+            )
     })
     .bind(&bind_addr)?
     .run()

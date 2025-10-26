@@ -1,11 +1,31 @@
 import React from 'react'
-import { Card, Form, Select, Space, Button, Divider } from 'antd'
+import { Card, Form, Select, Space, Button, Divider, message } from 'antd'
 import { FilterOutlined, ClearOutlined } from '@ant-design/icons'
+import { getServices } from '../../api/search'
 
 const { Option } = Select
 
 const FilterPanel = ({ onFilterChange, onReset }) => {
   const [form] = Form.useForm()
+  const [serviceOptions, setServiceOptions] = React.useState([])
+  const [serviceLoading, setServiceLoading] = React.useState(false)
+
+  React.useEffect(() => {
+    const fetchServices = async () => {
+      setServiceLoading(true)
+      try {
+        const response = await getServices()
+        const services = Array.isArray(response.services) ? response.services : []
+        setServiceOptions(services)
+      } catch (error) {
+        message.error(`加载服务列表失败: ${error.message}`)
+      } finally {
+        setServiceLoading(false)
+      }
+    }
+
+    fetchServices()
+  }, [])
 
   const handleValuesChange = (_, allValues) => {
     const filters = {}
@@ -69,11 +89,14 @@ const FilterPanel = ({ onFilterChange, onReset }) => {
             allowClear
             showSearch
             style={{ width: 200 }}
+            loading={serviceLoading}
+            notFoundContent={serviceLoading ? '加载中...' : undefined}
           >
-            <Option value="api-gateway">api-gateway</Option>
-            <Option value="user-service">user-service</Option>
-            <Option value="order-service">order-service</Option>
-            <Option value="payment-service">payment-service</Option>
+            {serviceOptions.map((service) => (
+              <Option key={service} value={service}>
+                {service}
+              </Option>
+            ))}
           </Select>
         </Form.Item>
 

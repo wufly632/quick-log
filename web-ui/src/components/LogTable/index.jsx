@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { Tag, Typography, Space, Tooltip, Switch, Pagination, Spin } from 'antd'
+import { Tag, Typography, Space, Tooltip, Switch, Pagination, Spin, message } from 'antd'
 import { CopyOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 
-const { Text, Paragraph } = Typography
+const { Text } = Typography
 
 const LogTable = ({ data, loading, pagination, onChange }) => {
   const [wrapText, setWrapText] = useState(false)
@@ -18,24 +18,69 @@ const LogTable = ({ data, loading, pagination, onChange }) => {
     return colors[level] || 'default'
   }
 
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text)
+  const copyToClipboard = async (text) => {
+    if (text === undefined || text === null) {
+      return
+    }
+
+    const value = typeof text === 'string' ? text : JSON.stringify(text)
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(value)
+      } else {
+        const textarea = document.createElement('textarea')
+        textarea.value = value
+        textarea.setAttribute('readonly', '')
+        textarea.style.position = 'absolute'
+        textarea.style.left = '-9999px'
+        document.body.appendChild(textarea)
+        textarea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textarea)
+      }
+      message.success('复制成功')
+    } catch (error) {
+      message.error('复制失败，请重试')
+    }
   }
 
   // 渲染日志卡片 - 一行一字段格式
   const renderLogCard = (record, index) => {
-    const renderField = (label, value, style = {}) => {
-      if (!value && value !== 0) return null
+    const renderField = (label, value, options = {}) => {
+      if (value === undefined || value === null) return null
+
+      const {
+        containerStyle = {},
+        valueStyle = {},
+        displayValue,
+        copyValue = value,
+      } = options
+
+      const content = displayValue !== undefined ? displayValue : value
       return (
-        <div style={{
-          padding: '4px 0',
-          fontSize: '13px',
-          fontFamily: 'Monaco, Menlo, Consolas, monospace',
-          lineHeight: '1.6',
-          ...style
-        }}>
-          <span style={{ color: '#1890ff', fontWeight: 600 }}>{label}:</span>{' '}
-          <span>{value}</span>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '8px',
+            padding: '4px 0',
+            fontSize: '13px',
+            fontFamily: 'Monaco, Menlo, Consolas, monospace',
+            lineHeight: '1.6',
+            ...containerStyle,
+          }}
+        >
+          <span style={{ color: '#1890ff', fontWeight: 600, minWidth: '72px' }}>{label}:</span>
+          <span style={{ flex: 1, ...valueStyle }}>
+            {content}
+          </span>
+          <Tooltip title="复制">
+            <CopyOutlined
+              style={{ color: '#1890ff', cursor: 'pointer', marginTop: 2 }}
+              onClick={() => copyToClipboard(copyValue)}
+            />
+          </Tooltip>
         </div>
       )
     }
@@ -56,7 +101,13 @@ const LogTable = ({ data, loading, pagination, onChange }) => {
         onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)'}
         onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)'}
       >
-        {renderField('level', record.level)}
+        {renderField('level', record.level, {
+          displayValue: (
+            <Tag color={getLevelColor(record.level)} style={{ marginRight: 0 }}>
+              {record.level}
+            </Tag>
+          ),
+        })}
         {renderField('time', dayjs(record.timestamp).format('YYYY-MM-DD HH:mm:ss.SSS'))}
         {renderField('service', record.service)}
         {renderField('host', record.host)}
@@ -65,11 +116,22 @@ const LogTable = ({ data, loading, pagination, onChange }) => {
         {record.span_id && renderField('span_id', record.span_id)}
 
         {renderField('message', record.message, {
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-all',
-          paddingTop: '8px',
-          borderTop: '1px dashed #d9d9d9',
-          marginTop: '8px'
+          containerStyle: {
+            paddingTop: '8px',
+            borderTop: '1px dashed #d9d9d9',
+            marginTop: '8px',
+          },
+          valueStyle: wrapText
+            ? {
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+              }
+            : {
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              },
+          copyValue: record.message,
         })}
 
         {record.stack_trace && (
@@ -78,8 +140,21 @@ const LogTable = ({ data, loading, pagination, onChange }) => {
             marginTop: '8px',
             borderTop: '1px dashed #d9d9d9'
           }}>
-            <div style={{ color: '#1890ff', fontWeight: 600, marginBottom: '4px' }}>
-              stack_trace:
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              color: '#1890ff',
+              fontWeight: 600,
+              marginBottom: '4px',
+            }}>
+              <span>stack_trace:</span>
+              <Tooltip title="复制">
+                <CopyOutlined
+                  style={{ color: '#1890ff', cursor: 'pointer' }}
+                  onClick={() => copyToClipboard(record.stack_trace.replace(/\\n/g, '\n').replace(/\\t/g, '\t'))}
+                />
+              </Tooltip>
             </div>
             <div style={{
               whiteSpace: 'pre-wrap',
@@ -104,8 +179,21 @@ const LogTable = ({ data, loading, pagination, onChange }) => {
             marginTop: '8px',
             borderTop: '1px dashed #d9d9d9'
           }}>
-            <div style={{ color: '#1890ff', fontWeight: 600, marginBottom: '4px' }}>
-              labels:
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              color: '#1890ff',
+              fontWeight: 600,
+              marginBottom: '4px',
+            }}>
+              <span>labels:</span>
+              <Tooltip title="复制">
+                <CopyOutlined
+                  style={{ color: '#1890ff', cursor: 'pointer' }}
+                  onClick={() => copyToClipboard(JSON.stringify(record.labels, null, 2))}
+                />
+              </Tooltip>
             </div>
             <pre style={{
               margin: 0,

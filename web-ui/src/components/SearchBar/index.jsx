@@ -9,9 +9,9 @@ const SearchBar = ({ onSearch, loading }) => {
   // 初始化为相对时间 "1小时"
   const [timeRange, setTimeRange] = React.useState({
     type: 'relative',
-    key: '1h',
-    label: '1小时',
-    dates: [dayjs().subtract(1, 'hour'), dayjs()]
+    key: '15m',
+    label: '15分钟',
+    dates: [dayjs().subtract(15, 'minute'), dayjs()]
   })
   const [popoverOpen, setPopoverOpen] = React.useState(false)
 
@@ -92,7 +92,7 @@ const SearchBar = ({ onSearch, loading }) => {
                 <div style={{marginBottom: '8px', fontWeight: 'bold'}}>支持 Lucene 查询语法：</div>
                 <div style={{marginBottom: '4px'}}>基础搜索：</div>
                 <div>• ERROR - 搜索包含 ERROR 的日志</div>
-                <div>• "database error" - 精确匹配短语</div>
+                <div>• &quot;database error&quot; - 精确匹配短语</div>
                 <div style={{marginTop: '8px', marginBottom: '4px'}}>布尔运算（大小写均可）：</div>
                 <div>• ERROR AND timeout - 同时包含</div>
                 <div>• ERROR OR WARN - 任意一个</div>
