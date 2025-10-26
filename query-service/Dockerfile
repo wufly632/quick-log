@@ -27,7 +27,7 @@ RUN touch src/main.rs && \
 # 运行阶段
 FROM alpine:latest
 
-RUN apk add --no-cache ca-certificates openssl
+RUN apk add --no-cache ca-certificates openssl curl
 
 WORKDIR /app
 COPY --from=builder /app/target/release/log-query-service .
