@@ -16,7 +16,7 @@ services:
   frontend:
     image: wufly632/quick-log-frontend:latest
     ports:
-      - "3000:80"
+      - "3700:80"
     depends_on:
       backend:
         condition: service_healthy
