@@ -2,10 +2,10 @@
 FROM rust:alpine AS builder
 
 # 设置 Cargo 镜像源（中科大）
-ENV CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse
-ENV CARGO_REGISTRIES_CRATES_IO_INDEX=https://mirrors.ustc.edu.cn/crates.io-index/
+# ENV CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse
+# ENV CARGO_REGISTRIES_CRATES_IO_INDEX=https://mirrors.ustc.edu.cn/crates.io-index/
 
-RUN apk add --no-cache musl-dev openssl-dev pkgconfig
+RUN apk add --no-cache musl-dev openssl-dev openssl-libs-static pkgconfig
 
 WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
