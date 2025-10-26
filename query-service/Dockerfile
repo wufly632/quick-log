@@ -1,7 +1,7 @@
 # 构建阶段
 FROM rust:alpine AS builder
 
-RUN apk add --no-cache musl-dev
+RUN apk add --no-cache musl-dev openssl-dev pkgconfig
 
 WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
@@ -23,7 +23,7 @@ RUN touch src/main.rs && \
 # 运行阶段
 FROM alpine:latest
 
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache ca-certificates openssl
 
 WORKDIR /app
 COPY --from=builder /app/target/release/log-query-service .
