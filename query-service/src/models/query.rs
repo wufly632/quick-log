@@ -173,3 +173,15 @@ pub struct LogHit {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub labels: Option<serde_json::Value>,
 }
+
+#[derive(Debug, Deserialize)]
+pub struct AiAnalyzeRequest {
+    pub trace_id: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct AiAnalyzeResponse {
+    pub analysis: String,
+    pub trace_id: String,
+}
+

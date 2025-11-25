@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
-import { Card, Space, message, Statistic, Row, Col } from 'antd'
-import { ClockCircleOutlined, FileTextOutlined } from '@ant-design/icons'
+import React, { useState, useMemo } from 'react'
+import { Card, Space, message, Statistic, Row, Col, Button, Tag } from 'antd'
+import { ClockCircleOutlined, FileTextOutlined, BulbOutlined } from '@ant-design/icons'
 import SearchBar from '../../components/SearchBar'
 import FilterPanel from '../../components/FilterPanel'
 import LogTable from '../../components/LogTable'
-import { searchLogs } from '../../api/search'
+import AiAnalysisModal from '../../components/AiAnalysisModal'
+import { searchLogs, aiAnalyzeError } from '../../api/search'
 
 const SearchPage = () => {
   const [loading, setLoading] = useState(false)
@@ -16,6 +17,41 @@ const SearchPage = () => {
     pageSize: 50,
     total: 0,
   })
+
+  // AI 分析相关状态
+  const [aiModalVisible, setAiModalVisible] = useState(false)
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiAnalysis, setAiAnalysis] = useState('')
+  const [aiTraceId, setAiTraceId] = useState('')
+
+  // 检查是否有 trace_id 可用于 AI 分析
+  const hasTraceId = useMemo(() => {
+    return data.some(log => log.trace_id)
+  }, [data])
+
+  // 处理 AI 分析
+  const handleAiAnalyze = async () => {
+    const traceId = data.find(log => log.trace_id)?.trace_id
+    if (!traceId) {
+      message.warning('未找到可分析的 trace_id')
+      return
+    }
+
+    setAiTraceId(traceId)
+    setAiModalVisible(true)
+    setAiLoading(true)
+    setAiAnalysis('')
+
+    try {
+      const result = await aiAnalyzeError(traceId)
+      setAiAnalysis(result.analysis)
+    } catch (error) {
+      message.error(`AI 分析失败: ${error.message}`)
+      setAiAnalysis('分析失败，请检查日志或稍后重试。')
+    } finally {
+      setAiLoading(false)
+    }
+  }
 
   // 搜索参数状态
   const [searchParams, setSearchParams] = useState({
@@ -177,7 +213,7 @@ const SearchPage = () => {
       {/* 统计信息 */}
       {total > 0 && (
         <Row gutter={16}>
-          <Col span={12}>
+          <Col span={8}>
             <Card>
               <Statistic
                 title="搜索结果"
@@ -187,7 +223,7 @@ const SearchPage = () => {
               />
             </Card>
           </Col>
-          <Col span={12}>
+          <Col span={8}>
             <Card>
               <Statistic
                 title="查询耗时"
@@ -195,6 +231,28 @@ const SearchPage = () => {
                 prefix={<ClockCircleOutlined />}
                 suffix="ms"
               />
+            </Card>
+          </Col>
+          <Col span={8}>
+            <Card>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <span style={{ color: 'rgba(0, 0, 0, 0.65)', fontSize: '14px' }}>
+                  AI 分析
+                </span>
+                {hasTraceId ? (
+                  <Button
+                    type="primary"
+                    icon={<BulbOutlined />}
+                    onClick={handleAiAnalyze}
+                    disabled={loading}
+                    loading={aiLoading}
+                  >
+                    AI 分析错误原因
+                  </Button>
+                ) : (
+                  <Tag color="default">暂无可分析的错误</Tag>
+                )}
+              </div>
             </Card>
           </Col>
         </Row>
@@ -209,6 +267,15 @@ const SearchPage = () => {
           onChange={handleTableChange}
         />
       </Card>
+
+      {/* AI 分析 Modal */}
+      <AiAnalysisModal
+        visible={aiModalVisible}
+        onClose={() => setAiModalVisible(false)}
+        loading={aiLoading}
+        analysis={aiAnalysis}
+        traceId={aiTraceId}
+      />
     </Space>
   )
 }

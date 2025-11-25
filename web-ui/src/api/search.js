@@ -64,4 +64,13 @@ export const healthCheck = () => {
   return axios.get('/health')
 }
 
+/**
+ * AI分析错误日志
+ * @param {string} traceId - Trace ID
+ * @returns {Promise}
+ */
+export const aiAnalyzeError = (traceId) => {
+  return apiClient.post('/ai/analyze', { trace_id: traceId })
+}
+
 export default apiClient

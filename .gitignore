@@ -30,3 +30,4 @@ tmp/
 
 # Large binary files
 query-service/quickwit-v0.8.2/
+.env

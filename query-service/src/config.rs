@@ -5,6 +5,7 @@ use serde::Deserialize;
 pub struct Config {
     pub server: ServerConfig,
     pub quickwit: QuickwitConfig,
+    pub ai_analyzer: AiAnalyzerConfig,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -17,6 +18,13 @@ pub struct ServerConfig {
 pub struct QuickwitConfig {
     pub base_url: String,
     pub index_id: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct AiAnalyzerConfig {
+    pub base_url: String,
+    pub api_key: Option<String>,
+    pub model: String,
 }
 
 impl Config {

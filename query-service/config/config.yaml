@@ -6,3 +6,14 @@ quickwit:
   base_url: "http://172.21.0.7:7280"
   #base_url: "http://localhost:7280"
   index_id: "logs"
+
+ai_analyzer:
+  # OpenAI/OpenRouter API
+  base_url: "https://openrouter.ai/api/v1"
+  # 从环境变量 APP__AI_ANALYZER__API_KEY 读取
+  api_key: ""
+  model: "x-ai/grok-4.1-fast:free"
+  # Anthropic API (如果使用)
+  # base_url: "https://api.anthropic.com"
+  # api_key: ""
+  # model: "claude-3-sonnet-20240229"
